@@ -8,11 +8,12 @@
 #include <stdbool.h>
 #include <string.h>
 
+#define MATRIX_TYPE double
 
 typedef struct Matrix {
 	uint16_t m;   //rows
 	uint16_t n;   //cols
-	int *matrix;
+	MATRIX_TYPE *matrix;
 } matrix_t;
 
 typedef int8_t byte;
@@ -35,8 +36,9 @@ byte matrix_add(matrix_t m1, matrix_t m2, matrix_t *matrix_out);
 byte matrix_sub(matrix_t m1, matrix_t m2, matrix_t *matrix_out);
 byte matrix_mult(matrix_t matrix1, matrix_t matrix2, matrix_t *matrix_out);
 byte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal);
+byte matrix_vectorize(matrix_t matrix, matrix_t *vectors);
 
-//void matrix_set
+void matrix_set(matrix_t *matrix, int x, int y, MATRIX_TYPE value);
 
 char grayscale_to_char(int input, int minv, int maxv);
 

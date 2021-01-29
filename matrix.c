@@ -8,7 +8,7 @@ void matrix_print(matrix_t input, bool print_size){
 
 	for(int row = 0; row < input.m; row ++){
 		for(int col = 0; col < input.n; col ++){
-			printf("%d", input.matrix[row*input.n + col]);
+			printf("%f", input.matrix[row*input.n + col]);
 			if(col < input.n-1) printf(" ");
 		}
 		//if(row < n-1) printf("\n");
@@ -18,7 +18,9 @@ void matrix_print(matrix_t input, bool print_size){
 
 
 void matrix_draw(matrix_t input){
+	//printf("\033[10A");
 	printf("\x1b[H");   //home cursor
+
 	/*
 	for(int i = 0; i < input.m; i ++){
 		printf("\033[1A\033[K");   //go to line up and clear the line
@@ -29,13 +31,14 @@ void matrix_draw(matrix_t input){
 		for(int col = 0; col < input.n; col ++){
 			printf("%c", grayscale_to_char(input.matrix[row*input.n + col], 0, 9));
 		}
+		usleep(10*1000);
 		//if(row < n-1) printf("\n");
-		printf("\n");
+		if(row < input.m - 1) printf("\n");
 	}
 }
 
 void matrix_alloc(matrix_t *input, int m, int n){   //
-	input->matrix = (int *)calloc(m*n, sizeof(int));
+	input->matrix = (MATRIX_TYPE *)calloc(m*n, sizeof(MATRIX_TYPE));
 	input->m = m;
 	input->n = n;
 }
@@ -60,7 +63,7 @@ byte matrix_scale_and_add(int scalar1, matrix_t m1, int scalar2, matrix_t m2, ma
 			matrix_out->matrix = NULL;
 		}
 		if(matrix_out->matrix == NULL){
-			matrix_out->matrix = (int *)calloc(m*n, sizeof(int));
+			matrix_out->matrix = (MATRIX_TYPE *)calloc(m*n, sizeof(MATRIX_TYPE));
 			matrix_out->m = m;
 			matrix_out->n = n;
 		}
@@ -105,14 +108,14 @@ byte matrix_mult(matrix_t matrix1, matrix_t matrix2, matrix_t *matrix_out){   //
 			matrix_out->matrix = NULL;
 		}
 		if(matrix_out->matrix == NULL){
-			matrix_out->matrix = (int *)calloc(matrix1.m*matrix2.n, sizeof(int));
+			matrix_out->matrix = (MATRIX_TYPE *)calloc(matrix1.m*matrix2.n, sizeof(MATRIX_TYPE));
 			matrix_out->m = matrix1.m;   //rows of first
 			matrix_out->n = matrix2.n;   //cols or second matrix
 		}
 
 		for(int rows = 0; rows < matrix1.m; rows ++){
 			for(int cols = 0; cols < matrix2.n; cols ++){
-				int sum = 0;
+				MATRIX_TYPE sum = 0;
 				for(int m2_rows = 0; m2_rows < matrix2.m; m2_rows ++){
 					sum += matrix1.matrix[rows*matrix1.n + m2_rows] * matrix2.matrix[m2_rows*matrix2.n + cols];
 				}
@@ -125,16 +128,39 @@ byte matrix_mult(matrix_t matrix1, matrix_t matrix2, matrix_t *matrix_out){   //
 	return 0;
 }
 
+byte matrix_set(matrix_t *matrix, int m, int n, MATRIX_TYPE value){
+	if(m >= matrix->m || n >= matrix->n) return -1;
+	matrix->matrix[m*matrix->n + n] = value;
 
+	return 0;
+}
+
+/*
+byte matrix_vectorize(matrix_t matrix, matrix_t *vectors){
+	int index = 0;
+	for(int row = 0; row < matrix.m; row ++){
+		for(int col = 0; col < matrix.n; col ++){
+			if(matrix.matrix[row*matrix.n + col] > 0){
+				vectors->matrix[0*vectors->n + index] = col;
+				vectors->matrix[0*vectors->n + index] = matrix.m - row;
+				index ++;
+			}
+		}
+	}
+}
+*/
 
 byte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal){
+	printf(">%d %d\n", terminal->m, terminal->n);
 	for(int col = 0; col < vectors.n; col ++){
-		int x = vectors.matrix[0*vectors.n + col] + terminal->m/2;
-		int y = vectors.matrix[1*vectors.n + col] + terminal->n/2;
+		int x = vectors.matrix[0*vectors.n + col] + terminal->n/2;
+		int y = vectors.matrix[1*vectors.n + col] + terminal->m/2 + 1;
 		//int z = 2*vectors.n + col;
-		
-		int pos = x*vectors.n + y;   //rows*total_columns + columns
-		terminal->matrix[pos] = vectors.matrix[pos];
+		//printf("%d %d\n", x, y);
+		//int pos = y*terminal->n + x;   //rows*total_columns + columns
+		//printf("%d ", pos);
+		matrix_set(terminal, terminal->m-y, x, 10);
+		//terminal->matrix[pos] = vectors.matrix[pos];
 	}
 
 	return 0;
