@@ -38,7 +38,7 @@ byte matrix_mult(matrix_t matrix1, matrix_t matrix2, matrix_t *matrix_out);
 byte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal);
 byte matrix_vectorize(matrix_t matrix, matrix_t *vectors);
 
-void matrix_set(matrix_t *matrix, int x, int y, MATRIX_TYPE value);
+byte matrix_set(matrix_t *matrix, int x, int y, MATRIX_TYPE value);
 
 char grayscale_to_char(int input, int minv, int maxv);
 
