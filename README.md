@@ -1,5 +1,5 @@
-C Graphics
------
+# C Graphics
+
 
 ## Compilation & run
 ```make && make test```
