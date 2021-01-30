@@ -4,9 +4,13 @@
 #include <sys/ioctl.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <time.h>
+#include <errno.h>
 
 
-#define DEBUG 1
+
+//#define DEBUG 1
+#define PI 3.141592654
 
 
 #if defined(DEBUG) && DEBUG > 0
@@ -23,6 +27,7 @@ typedef struct term_info {
 } term_info_t;
 
 
+
 term_info_t get_terminal_info();
 
 void clear_terminal();
@@ -30,5 +35,7 @@ void reset_colors();
 
 int min(int a, int b);
 int max(int a, int b);
+
+int msleep(long msec);
 
 #endif

@@ -6,8 +6,8 @@
 #include <imago2.h>
 
 
-#define PI 3.141592654
 
+#define IMG "images/dostal.jpg"
 
 
 int main (int argc, char **argv){
@@ -49,10 +49,8 @@ int main (int argc, char **argv){
 	sleep(2);
 	*/
 
-	term_info_t term_info = get_terminal_info();
-	printf("width: %d, height: %d\n", term_info.width, term_info.height);
+	term_info_t term_info;
 
-	matrix_t matrix = {.matrix = NULL};
 	matrix_t out_vectors = {.matrix = NULL};
 	matrix_t transformation = {.matrix = NULL};
 	matrix_t rotation = {.matrix = NULL};
@@ -63,13 +61,19 @@ int main (int argc, char **argv){
 	matrix_t terminal = {.matrix = NULL};
 	matrix_t vectors = {.matrix = NULL};
 
-	//int image_size = min(term_info.width, term_info.height);
-	//int n = image_size;
 
-	int width = term_info.width;
-	int height = term_info.height;
+	int index; //int width, height, 
+	int img_width, img_height;
 
-	matrix_alloc(&terminal, height, width);
+	struct img_pixmap img;
+
+
+	term_info = get_terminal_info();
+	printf("width: %d, height: %d\n", term_info.width, term_info.height);
+	//width = term_info.width;
+	//height = term_info.height;
+
+	matrix_alloc(&terminal, term_info.height, term_info.width);
 	matrix_alloc(&vectors, VECTOR_DIM, 15000); //width*height);
 	matrix_alloc(&transformation, VECTOR_DIM, VECTOR_DIM);
 	matrix_alloc(&rotation, VECTOR_DIM, VECTOR_DIM);
@@ -81,55 +85,50 @@ int main (int argc, char **argv){
 	matrix_set(&transformation, 1, 1, 1);   //Y
 	matrix_set(&transformation, 2, 2, 1);   //Z
 	matrix_set(&transformation, 3, 3, 1);   //grayscale
-	matrix_set(&transformation, 4, 4, 1);   //ansi color
+	matrix_set(&transformation, 4, 4, 1);   //color
 
 	
 	matrix_set(&scale, 0, 0, 0.8);
 	matrix_set(&scale, 1, 1, 0.8);
 	matrix_set(&scale, 2, 2, 1);
 	matrix_set(&scale, 3, 3, 1);   //grayscale
-	matrix_set(&scale, 4, 4, 1);   //ansi color
+	matrix_set(&scale, 4, 4, 1);   //color
 
 	//printf(">%d<\n", grayscale_to_char(100, -100, 100));
 
 	
-	int index = 0;
+	index = 0;
 	
+	img_init(&img);
+	img_load(&img, IMG);
+	
+	img_width = img.width;
+	img_height = img.height;
+	
+	float img_scale = 4;
 
-	{
-		int width, height;
-		int r,g,b,a;
+	if(img_height > term_info.height) img_scale = img_height/term_info.height/2;
 
-		struct img_pixmap img;
-		img_init(&img);
-		img_load(&img, "images/dostal.jpg");
-		
-		width = img.width;
-		height = img.height;
-		
-		float img_scale = 4;
-
-		if(height > term_info.height) img_scale = height/term_info.height/2;
-
-		for(int x = 0; x < width; x += 1){
-			for(int y = 0; y < height; y += 1){
-				img_getpixel4i(&img, x, y, &r, &g, &b, &a);
-				matrix_add_vector(&vectors, &index, (x-width/2)/img_scale, (height-y-height/2)/img_scale, 0, GRAYSCALE_MAX, color_convert(r,g,b));
-				//printf("index: %d. %d %d %d color: %d\n", index, r,g,b, rgbToAnsi256(r,g,b));
-				//if(index > 5) exit(0);
-			}
+	for(int x = 0; x < img_width; x += 1){
+		for(int y = 0; y < img_height; y += 1){
+			int r,g,b,a;
+			img_getpixel4i(&img, x, y, &r, &g, &b, &a);
+			matrix_add_vector(&vectors, &index, (x-img_width/2)/img_scale, (img_height-y-img_height/2)/img_scale, 0, GRAYSCALE_MAX, color_convert(r,g,b));
+			//printf("index: %d. %d %d %d color: %d\n", index, r,g,b, rgbToAnsi256(r,g,b));
+			//if(index > 5) exit(0);
 		}
-		
-		img_destroy(&img);
-
-
-
-		printf("scale: %f, term w: %d, term h: %d, width: %d, height: %d, RGBA %d %d %d %d\n", img_scale, term_info.width, term_info.height, width, height, r, g, b, a);
 	}
+	
+	img_destroy(&img);
+
+
+
+	//printf("scale: %f, term w: %d, term h: %d, width: %d, height: %d, RGBA %d %d %d %d\n", img_scale, term_info.width, term_info.height, width, height, r, g, b, a);
+	
 	
 
 	printf("index: %d\n\n", index);
-	sleep(2);
+	sleep(1);
 	//vectors.matrix[0*vectors.n + 0] = 10;
 	//vectors.matrix[1*vectors.n + 0] = 0;
 /*
@@ -169,7 +168,7 @@ int main (int argc, char **argv){
 
 		//matrix_print(rotation, true);
 		matrix_draw(terminal);
-		usleep(5*1000);
+		msleep(5);
 	}
 	
 	
@@ -188,7 +187,7 @@ int main (int argc, char **argv){
 		vectors_to_terminal_matrix(vectors, &terminal, index);
 
 		matrix_draw(terminal);
-		usleep(5*1000);
+		msleep(5);
 
 		if(pos == 0) i ++;
 		if(i == 100){
@@ -205,17 +204,16 @@ int main (int argc, char **argv){
 	sleep(2);
 	reset_colors();
 
-	
+
 	matrix_free(transformation);
 	matrix_free(rotation);
 	matrix_free(scale);
 	matrix_free(shear);
 
-
+	matrix_free(terminal);
 	matrix_free(vectors);
 	matrix_free(out_vectors);
-	matrix_free(terminal);
-	matrix_free(matrix);
+	
 
 	return 0;
 }

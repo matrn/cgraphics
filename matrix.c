@@ -259,16 +259,16 @@ sbyte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal, int max_i
 		
 		union sat_and_color_u fin;
 		fin.b[0] = grayscale;
-		if((int)color <= 0){
+		/*if((int)color <= 0){
 			fin.b[1] = 255;
 			fin.b[2] = 255;
 			fin.b[3] = 255;
 		}
-		else{
+		else{*/
 			fin.b[1] = conv.b[0];
 			fin.b[2] = conv.b[1];
 			fin.b[3] = conv.b[2];
-		}
+		//}
 		/*printf("gray: %d, color: %d %d %d\n", grayscale, conv.b[0], conv.b[1], conv.b[2]);
 		if(color != 0) sleep(2);
 		*/

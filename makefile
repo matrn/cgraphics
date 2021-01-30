@@ -1,4 +1,4 @@
-CFLAGS+=  -pedantic -Wall -std=c99 -O3 -g
+CFLAGS+=  -pedantic -Wall -O3 -g #-std=c99
 ENDFLAGS+= -lm -limago
 
 main: main.c utils.c utils.h matrix.c matrix.h

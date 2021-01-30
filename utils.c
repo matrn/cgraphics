@@ -1,5 +1,16 @@
 #include "utils.h"
 
+
+
+int min(int a, int b){
+	return a<b?a:b;
+}
+
+int max(int a, int b){
+	return a>b?a:b;
+}
+
+
 term_info_t get_terminal_info(){
 	struct winsize w;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
@@ -18,14 +29,6 @@ term_info_t get_terminal_info(){
 }
 
 
-int min(int a, int b){
-	return a<b?a:b;
-}
-
-int max(int a, int b){
-	return a>b?a:b;
-}
-
 void clear_terminal(){
 	term_info_t term = get_terminal_info();
 
@@ -37,4 +40,26 @@ void clear_terminal(){
 
 void reset_colors(){
 	printf("\033[0m");
+}
+
+
+
+/* msleep(): sleep for the requested number of milliseconds. */
+int msleep(long msec){
+    struct timespec ts;
+    int res;
+
+    if (msec < 0){
+        errno = EINVAL;
+        return -1;
+    }
+
+    ts.tv_sec = msec / 1000;
+    ts.tv_nsec = (msec % 1000) * 1000000;
+
+    do {
+        res = nanosleep(&ts, &ts);
+    } while (res && errno == EINTR);
+
+    return res;
 }
