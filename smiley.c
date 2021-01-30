@@ -7,7 +7,6 @@
 
 #define PI 3.141592654
 
-#define VECTOR_DIM 4
 
 int main (int argc, char **argv){
     //DEBUG_PRINT("Debug level: %d", (int) DEBUG);
@@ -78,33 +77,33 @@ int main (int argc, char **argv){
     	int y = r * sin(theta);
 		//printf("%d, %d\n", x, y);
 		
-		matrix_add_vector(&vectors, &index, x, y, 0, GRAYSCALE_MAX);
+		matrix_add_vector(&vectors, &index, x, y, 0, GRAYSCALE_MAX, -1);   //-1 = nocolor
 	}
 	printf("index: %d\n\n", index);
 	
-	matrix_add_vector(&vectors, &index, r/2, r/2, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, r/2, r/2-1, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, r/2-1, r/2, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, r/2-1, r/2-1, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, r/2-2, r/2, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, r/2-2, r/2-1, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, r/2, r/2, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, r/2, r/2-1, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, r/2-1, r/2, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, r/2-1, r/2-1, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, r/2-2, r/2, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, r/2-2, r/2-1, 0, GRAYSCALE_MAX, -1);
 
-	matrix_add_vector(&vectors, &index, -r/2, r/2, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, -r/2, r/2-1, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, -r/2+1, r/2, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, -r/2+1, r/2-1, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, -r/2+2, r/2, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, -r/2+2, r/2-1, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, -r/2, r/2, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, -r/2, r/2-1, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, -r/2+1, r/2, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, -r/2+1, r/2-1, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, -r/2+2, r/2, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, -r/2+2, r/2-1, 0, GRAYSCALE_MAX, -1);
 
-	matrix_add_vector(&vectors, &index, 0, 0, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, 0, 1, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, 0, 2, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, 1, 0, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, 1, 1, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, 1, 2, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, -1, 0, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, -1, 1, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, -1, 2, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, 0, 0, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, 0, 1, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, 0, 2, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, 1, 0, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, 1, 1, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, 1, 2, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, -1, 0, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, -1, 1, 0, GRAYSCALE_MAX, -1);
+	matrix_add_vector(&vectors, &index, -1, 2, 0, GRAYSCALE_MAX, -1);
 
 	
 	for(int i = 0; i < 180; i ++){
@@ -113,7 +112,7 @@ int main (int argc, char **argv){
     	int y = r/2 * sin(theta);
 		//printf("%d, %d\n", x, y);
 		
-		matrix_add_vector(&vectors, &index, x, -y -r/4, 0, GRAYSCALE_MAX);
+		matrix_add_vector(&vectors, &index, x, -y -r/4, 0, GRAYSCALE_MAX, -1);
 	}
 	
 
@@ -209,8 +208,7 @@ int main (int argc, char **argv){
 	matrix_free(out_vectors);
 	matrix_free(terminal);
 	matrix_free(matrix);
-	//matrix_free(m1);
-	//matrix_free(m2);
 
+	
 	return 0;
 }

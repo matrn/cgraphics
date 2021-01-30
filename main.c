@@ -8,41 +8,6 @@
 
 #define PI 3.141592654
 
-#define VECTOR_DIM 5
-
-
-int rgbToAnsi256(int r, int g, int b) {
-    // we use the extended greyscale palette here, with the exception of
-    // black and white. normal palette only has 4 greyscale shades.
-    if (r == g && g == b) {
-        if (r < 8) {
-            return 16;
-        }
-
-        if (r > 248) {
-            return 231;
-        }
-
-        return round(((r - 8.0) / 247.0) * 24.0) + 232;
-    }
-
-    int ansi = 16
-        + (36.0 * round(r / 255.0 * 5.0))
-        + (6.0 * round(g / 255.0 * 5.0))
-        + round(b / 255.0 * 5.0);
-
-    return ansi;
-}
-
-MATRIX_TYPE color_convert(int r, int g, int b){
-	//printf("RGB: %d %d %d\n", r,g,b);
-	union color_conv_u color;
-	color.b[0] = r;
-	color.b[1] = g;
-	color.b[2] = b;
-
-	return color.vec;
-}
 
 
 int main (int argc, char **argv){
@@ -105,7 +70,7 @@ int main (int argc, char **argv){
 	int height = term_info.height;
 
 	matrix_alloc(&terminal, height, width);
-	matrix_alloc(&vectors, VECTOR_DIM, 80000); //width*height);
+	matrix_alloc(&vectors, VECTOR_DIM, 15000); //width*height);
 	matrix_alloc(&transformation, VECTOR_DIM, VECTOR_DIM);
 	matrix_alloc(&rotation, VECTOR_DIM, VECTOR_DIM);
 	matrix_alloc(&scale, VECTOR_DIM, VECTOR_DIM);
@@ -238,6 +203,9 @@ int main (int argc, char **argv){
 	}
 
 	sleep(2);
+	reset_colors();
+
+	
 	matrix_free(transformation);
 	matrix_free(rotation);
 	matrix_free(scale);
@@ -248,8 +216,6 @@ int main (int argc, char **argv){
 	matrix_free(out_vectors);
 	matrix_free(terminal);
 	matrix_free(matrix);
-	//matrix_free(m1);
-	//matrix_free(m2);
 
 	return 0;
 }

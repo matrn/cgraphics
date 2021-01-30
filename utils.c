@@ -34,3 +34,7 @@ void clear_terminal(){
 		printf("\033[K\n");
 	}
 }
+
+void reset_colors(){
+	printf("\033[0m");
+}

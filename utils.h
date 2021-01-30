@@ -26,7 +26,7 @@ typedef struct term_info {
 term_info_t get_terminal_info();
 
 void clear_terminal();
-
+void reset_colors();
 
 int min(int a, int b);
 int max(int a, int b);
