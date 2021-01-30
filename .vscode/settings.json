@@ -1,8 +1,0 @@
-{
-	"files.associations": {
-		"**/templates/*.html": "django-html",
-		"**/templates/*": "django-txt",
-		"math.h": "c",
-		"unistd.h": "c"
-	}
-}
