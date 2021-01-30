@@ -1,4 +1,4 @@
-# C Graphics
+C Graphics
 -----
 
 ## Compilation & run
