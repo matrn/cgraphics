@@ -29,7 +29,7 @@ void matrix_draw(matrix_t input){
 
 	for(int row = 0; row < input.m; row ++){
 		for(int col = 0; col < input.n; col ++){
-			printf("%c", grayscale_to_char(input.matrix[row*input.n + col], 0, 9));
+			printf("%c", grayscale_to_char(input.matrix[row*input.n + col], GRAYSCALE_MIN, GRAYSCALE_MAX));
 		}
 		//usleep(10*1000);
 		//if(row < n-1) printf("\n");
@@ -48,7 +48,7 @@ void matrix_free(matrix_t input){
 }
 
 
-bool matrix_add_vector(matrix_t *vectors, int *index, int x, int y, int z){
+bool matrix_add_vector(matrix_t *vectors, int *index, int x, int y, int z, int grayscale){
 	for(int q = 0; q < *index; q ++){
 		if(vectors->matrix[0*vectors->n + q] == x && vectors->matrix[1*vectors->n + q] == y){
 			return false;
@@ -59,6 +59,8 @@ bool matrix_add_vector(matrix_t *vectors, int *index, int x, int y, int z){
 
 	vectors->matrix[0*vectors->n + *index] = x;
 	vectors->matrix[1*vectors->n + *index] = y;
+	vectors->matrix[2*vectors->n + *index] = z;
+	vectors->matrix[3*vectors->n + *index] = grayscale;
 
 	(*index) ++;
 	
@@ -106,16 +108,6 @@ sbyte matrix_sub(matrix_t m1, matrix_t m2, matrix_t *matrix_out){
 	return matrix_scale_and_add(1, m1, -1, m2, matrix_out);
 }
 
-
-char grayscale_to_char(int input, int minv, int maxv){
-	if(input > maxv) input = maxv;
-	if(input < minv) input = minv;
-
-	int grayscale_size = strlen(grayscale_letters);   //grayscale letters count
-	int converted_size = (input - minv)*(grayscale_size-1)/(maxv-minv);
-
-	return grayscale_letters[converted_size];
-}
 
 
 void matrix_zero(matrix_t *input){
@@ -177,12 +169,14 @@ sbyte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal, int max_i
 	//printf(">%d %d\n", terminal->m, terminal->n);
 	for(int col = 0; col < max_index; col ++){
 		int x = vectors.matrix[0*vectors.n + col] + terminal->n/2 + 0.4;
-		int y = vectors.matrix[1*vectors.n + col] + terminal->m/2 + 1 + 0.4;
+		int y = vectors.matrix[1*vectors.n + col]*RATIO + terminal->m/2 + 1 + 0.4;
+		int z = vectors.matrix[2*vectors.n + col];
+		int grayscale = vectors.matrix[3*vectors.n + col];
 		//int z = 2*vectors.n + col;
 		//printf("%d %d\n", x, y);
 		//int pos = y*terminal->n + x;   //rows*total_columns + columns
 		//printf("%d ", pos);
-		matrix_set(terminal, terminal->m-y, x, 10);
+		matrix_set(terminal, terminal->m-y, x, grayscale);
 		//terminal->matrix[pos] = vectors.matrix[pos];
 	}
 
@@ -217,83 +211,12 @@ sbyte matrix_copy(matrix_t matrix1, matrix_t *matrix_out){   //source, destinati
 
 
 
+char grayscale_to_char(int input, int minv, int maxv){
+	if(input > maxv) input = maxv;
+	if(input < minv) input = minv;
 
-/*
-int main(){
-	//int n1=0, m1=0;
-	//int n2=0, m2=0;
-	int rtn = 0;
-	//int *matrix1, *matrix2;
-	Matrix matrix_sum = { .matrix = NULL, .n = 0, .m = 0 };
-	Matrix matrix1 = { .matrix = NULL };
-	Matrix matrix2 = { .matrix = NULL };
-	Matrix matrix3 = { .matrix = NULL };
-	Matrix matrix_out = { .matrix = NULL };
+	int grayscale_size = strlen(grayscale_letters);   //grayscale letters count
+	int converted_size = (input - minv)*(grayscale_size-1)/(maxv-minv);
 
-
-	char operation = 0;
-
-	uint8_t pos = 0;
-
-	bool operation_or_matrix = true;
-	char first_operation = 0;
-	char second_operation = 0;
-
-
-
-		}
-		else{
-			//#ifdef DEBUG
-			//	puts("operation");
-			//#endif
-			while(!check_operation(operation)){
-				int rtn = 0;
-				//printf(">%c<\n", operation);
-				if((rtn = scanf("%c\n", &operation)) != 1){
-					if (rtn == EOF) break;
-					rtn = err_input();
-					goto clean;
-				}
-			}
-			//printf(">%c<\n", operation);
-			if(check_operation(operation)){
-				if(first_operation == 0) first_operation = operation;
-				else if(second_operation == 0) second_operation = operation;
-			}
-			operation = 0;
-		}
-		operation_or_matrix = !operation_or_matrix;
-	}
-		//print_matrix(matrix1);
-		//printf("\n");
-
-	//printf("%c,%c\n", first_operation, second_operation);
-	if(second_operation != 0){
-		//puts("sec");
-		#ifdef DEBUG
-			puts("end - sec");
-		#endif
-		if((rtn = matrices_compute(matrix2, matrix3, &matrix_out, second_operation)) != 0) goto clean;
-		m_copy(&matrix2, matrix_out);
-	}
-	if(first_operation != 0){
-		//puts("frst");
-		#ifdef DEBUG
-			puts("end - frst");
-		#endif
-		if((rtn = matrices_compute(matrix1, matrix2, &matrix_out, first_operation)) != 0) goto clean;
-		m_copy(&matrix_sum, matrix_out);
-	}
-	print_matrix(matrix_sum, true);
-
-	clean:
-		if(matrix_sum.matrix != NULL) free(matrix_sum.matrix);
-		if(matrix1.matrix != NULL) free(matrix1.matrix);
-		if(matrix2.matrix != NULL) free(matrix2.matrix);
-		if(matrix3.matrix != NULL) free(matrix3.matrix);
-		if(matrix_out.matrix != NULL) free(matrix_out.matrix);
-
-	if(rtn < 0) rtn = 0;
-	return rtn;
+	return grayscale_letters[converted_size];
 }
-*/

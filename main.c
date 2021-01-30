@@ -4,13 +4,26 @@
 #include "utils.h"
 #include "matrix.h"
 
+#include "easyppm/easyppm.h"
 
-#define RATIO 7.0/15.0
-#define RATIO_INV 15.0/7.0
+
+
 #define PI 3.141592654
 
+#define VECTOR_DIM 4
 
 int main (int argc, char **argv){
+	PPM ppm;
+	ppm.image = NULL;
+	easyppm_read(&ppm, "finger_circle.ppm");
+	printf("%d %d\n", ppm.width, ppm.height);
+	ppmcolor color = easyppm_get(&ppm, 0, 0);    
+    easyppm_destroy(&ppm);
+
+	printf("width: %d, height: %d, RGB %d %d %d\n", ppm.width, ppm.height, color.r, color.g, color.b);
+
+
+
     //DEBUG_PRINT("Debug level: %d", (int) DEBUG);
 
 	term_info_t term_info = get_terminal_info();
@@ -34,20 +47,23 @@ int main (int argc, char **argv){
 	int height = term_info.height;
 
 	matrix_alloc(&terminal, height, width);
-	matrix_alloc(&vectors, 3, 800); //width*height);
-	matrix_alloc(&transformation, 3, 3);
-	matrix_alloc(&rotation, 3, 3);
-	matrix_alloc(&scale, 3, 3);
-	matrix_alloc(&shear, 3, 3);
+	matrix_alloc(&vectors, VECTOR_DIM, 800); //width*height);
+	matrix_alloc(&transformation, VECTOR_DIM, VECTOR_DIM);
+	matrix_alloc(&rotation, VECTOR_DIM, VECTOR_DIM);
+	matrix_alloc(&scale, VECTOR_DIM, VECTOR_DIM);
+	matrix_alloc(&shear, VECTOR_DIM, VECTOR_DIM);
 
-	matrix_set(&transformation, 0, 0, 1);
-	matrix_set(&transformation, 1, 1, 1);
-	matrix_set(&transformation, 2, 2, 1);
+
+	matrix_set(&transformation, 0, 0, 1);   //X
+	matrix_set(&transformation, 1, 1, 1);   //Y
+	matrix_set(&transformation, 2, 2, 1);   //Z
+	matrix_set(&transformation, 3, 3, 1);   //grayscale
 
 	
 	matrix_set(&scale, 0, 0, 0.8);
 	matrix_set(&scale, 1, 1, 0.8);
 	matrix_set(&scale, 2, 2, 1);
+	matrix_set(&scale, 3, 3, 1);   //grayscale
 
 	//printf(">%d<\n", grayscale_to_char(100, -100, 100));
 
@@ -76,33 +92,33 @@ int main (int argc, char **argv){
     	int y = r * sin(theta);
 		//printf("%d, %d\n", x, y);
 		
-		matrix_add_vector(&vectors, &index, x, y, 0);
+		matrix_add_vector(&vectors, &index, x, y, 0, GRAYSCALE_MAX);
 	}
 	printf("index: %d\n\n", index);
 	
-	matrix_add_vector(&vectors, &index, r/2, r/2, 0);
-	matrix_add_vector(&vectors, &index, r/2, r/2-1, 0);
-	matrix_add_vector(&vectors, &index, r/2-1, r/2, 0);
-	matrix_add_vector(&vectors, &index, r/2-1, r/2-1, 0);
-	matrix_add_vector(&vectors, &index, r/2-2, r/2, 0);
-	matrix_add_vector(&vectors, &index, r/2-2, r/2-1, 0);
+	matrix_add_vector(&vectors, &index, r/2, r/2, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, r/2, r/2-1, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, r/2-1, r/2, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, r/2-1, r/2-1, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, r/2-2, r/2, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, r/2-2, r/2-1, 0, GRAYSCALE_MAX);
 
-	matrix_add_vector(&vectors, &index, -r/2, r/2, 0);
-	matrix_add_vector(&vectors, &index, -r/2, r/2-1, 0);
-	matrix_add_vector(&vectors, &index, -r/2+1, r/2, 0);
-	matrix_add_vector(&vectors, &index, -r/2+1, r/2-1, 0);
-	matrix_add_vector(&vectors, &index, -r/2+2, r/2, 0);
-	matrix_add_vector(&vectors, &index, -r/2+2, r/2-1, 0);
+	matrix_add_vector(&vectors, &index, -r/2, r/2, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, -r/2, r/2-1, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, -r/2+1, r/2, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, -r/2+1, r/2-1, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, -r/2+2, r/2, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, -r/2+2, r/2-1, 0, GRAYSCALE_MAX);
 
-	matrix_add_vector(&vectors, &index, 0, 0, 0);
-	matrix_add_vector(&vectors, &index, 0, 1, 0);
-	matrix_add_vector(&vectors, &index, 0, 2, 0);
-	matrix_add_vector(&vectors, &index, 1, 0, 0);
-	matrix_add_vector(&vectors, &index, 1, 1, 0);
-	matrix_add_vector(&vectors, &index, 1, 2, 0);
-	matrix_add_vector(&vectors, &index, -1, 0, 0);
-	matrix_add_vector(&vectors, &index, -1, 1, 0);
-	matrix_add_vector(&vectors, &index, -1, 2, 0);
+	matrix_add_vector(&vectors, &index, 0, 0, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, 0, 1, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, 0, 2, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, 1, 0, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, 1, 1, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, 1, 2, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, -1, 0, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, -1, 1, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, -1, 2, 0, GRAYSCALE_MAX);
 
 	
 	for(int i = 0; i < 180; i ++){
@@ -111,7 +127,7 @@ int main (int argc, char **argv){
     	int y = r/2 * sin(theta);
 		//printf("%d, %d\n", x, y);
 		
-		matrix_add_vector(&vectors, &index, x, -y -r/4, 0);
+		matrix_add_vector(&vectors, &index, x, -y -r/4, 0, GRAYSCALE_MAX);
 	}
 	
 
@@ -153,9 +169,10 @@ int main (int argc, char **argv){
 		double a = (i*PI)/180.0;
 		//a = 0;
 		matrix_set(&rotation, 0, 0, cos(a));
-		matrix_set(&rotation, 1, 0, sin(a)*RATIO);
+		matrix_set(&rotation, 1, 0, sin(a));
 		matrix_set(&rotation, 0, 1, -sin(a));
-		matrix_set(&rotation, 1, 1, cos(a)*RATIO);		
+		matrix_set(&rotation, 1, 1, cos(a));
+		matrix_set(&rotation, 3, 3, 1);
 		matrix_mult(rotation, out_vectors, &vectors);
 		//matrix_print(vectors, true);
 		matrix_zero(&terminal);
@@ -173,7 +190,8 @@ int main (int argc, char **argv){
 		matrix_set(&shear, 0, 0, 1);
 		//matrix_set(&shear, 1, 0, i/100.0*RATIO);
 		matrix_set(&shear, 0, 1, i/100.0);
-		matrix_set(&shear, 1, 1, 1*RATIO);
+		matrix_set(&shear, 1, 1, 1);
+		matrix_set(&shear, 3, 3, 1);
 		matrix_mult(shear, out_vectors, &vectors);
 
 		matrix_zero(&terminal);
