@@ -74,7 +74,7 @@ int main (int argc, char **argv){
 	//height = term_info.height;
 
 	matrix_alloc(&terminal, term_info.height, term_info.width);
-	matrix_alloc(&vectors, VECTOR_DIM, 15000); //width*height);
+	matrix_alloc(&vectors, VECTOR_DIM, 50000); //width*height);
 	matrix_alloc(&transformation, VECTOR_DIM, VECTOR_DIM);
 	matrix_alloc(&rotation, VECTOR_DIM, VECTOR_DIM);
 	matrix_alloc(&scale, VECTOR_DIM, VECTOR_DIM);
