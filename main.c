@@ -8,10 +8,58 @@
 
 #define PI 3.141592654
 
-#define VECTOR_DIM 4
+#define VECTOR_DIM 5
+
+
+int rgbToAnsi256(int r, int g, int b) {
+    // we use the extended greyscale palette here, with the exception of
+    // black and white. normal palette only has 4 greyscale shades.
+    if (r == g && g == b) {
+        if (r < 8) {
+            return 16;
+        }
+
+        if (r > 248) {
+            return 231;
+        }
+
+        return round(((r - 8.0) / 247.0) * 24.0) + 232;
+    }
+
+    int ansi = 16
+        + (36.0 * round(r / 255.0 * 5.0))
+        + (6.0 * round(g / 255.0 * 5.0))
+        + round(b / 255.0 * 5.0);
+
+    return ansi;
+}
+
 
 int main (int argc, char **argv){
     //DEBUG_PRINT("Debug level: %d", (int) DEBUG);
+	
+	printf("ansi: %d\n", rgbToAnsi256(253,13,0));
+
+	/*
+	union int16_to_bytes conv;
+	conv.integer = -1;
+
+	union color_conv fin;
+	fin.b[0] = 10;
+	fin.b[1] = conv.b[0];
+	fin.b[2] = conv.b[1];
+
+	union color_conv fin2;
+	fin2.vec = fin.vec;
+
+	union int16_to_bytes color;
+	color.b[0] = fin2.b[1];
+	color.b[1] = fin2.b[2];
+
+	printf("grayscale:%d, color: %d\n", fin2.b[0], color.integer);
+	puts("gg");
+	sleep(2);
+	*/
 
 	term_info_t term_info = get_terminal_info();
 	printf("width: %d, height: %d\n", term_info.width, term_info.height);
@@ -45,16 +93,17 @@ int main (int argc, char **argv){
 	matrix_set(&transformation, 1, 1, 1);   //Y
 	matrix_set(&transformation, 2, 2, 1);   //Z
 	matrix_set(&transformation, 3, 3, 1);   //grayscale
+	matrix_set(&transformation, 4, 4, 1);   //ansi color
 
 	
 	matrix_set(&scale, 0, 0, 0.8);
 	matrix_set(&scale, 1, 1, 0.8);
 	matrix_set(&scale, 2, 2, 1);
 	matrix_set(&scale, 3, 3, 1);   //grayscale
+	matrix_set(&scale, 4, 4, 1);   //ansi color
 
 	//printf(">%d<\n", grayscale_to_char(100, -100, 100));
 
-	double r = (min(width, (height-1)*RATIO_INV)/2.0);
 	
 	int index = 0;
 	
@@ -65,16 +114,21 @@ int main (int argc, char **argv){
 
 		struct img_pixmap img;
 		img_init(&img);
-		img_load(&img, "finger_circle.png");
+		img_load(&img, "images/rainbow.jpeg");
 		
 		width = img.width;
 		height = img.height;
+		
+		float img_scale = 4;
 
-		for(int x = 0; x < width; x += 2){
-			for(int y = 0; y < width; y +=2){
+		if(height > term_info.height) img_scale = height/term_info.height/2;
+
+		for(int x = 0; x < width; x += 1){
+			for(int y = 0; y < height; y += 1){
 				img_getpixel4i(&img, x, y, &r, &g, &b, &a);
-				matrix_add_vector(&vectors, &index, (x-width/2)/2, (height-y -height/2)/2, 0, r);
-				printf("index: %d\n", index);
+				matrix_add_vector(&vectors, &index, (x-width/2)/img_scale, (height-y-height/2)/img_scale, 0, GRAYSCALE_MAX, rgbToAnsi256(r,g,b));
+				printf("index: %d. %d %d %d color: %d\n", index, r,g,b, rgbToAnsi256(r,g,b));
+				if(index > 5) exit(0);
 			}
 		}
 		
@@ -82,22 +136,12 @@ int main (int argc, char **argv){
 
 
 
-		printf("width: %d, height: %d, RGBA %d %d %d %d\n", width, height, r, g, b, a);
+		printf("scale: %f, term w: %d, term h: %d, width: %d, height: %d, RGBA %d %d %d %d\n", img_scale, term_info.width, term_info.height, width, height, r, g, b, a);
 	}
-	matrix_add_vector(&vectors, &index, 0, 0, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, 0, 1, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, 0, 2, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, 1, 0, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, 1, 1, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, 1, 2, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, -1, 0, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, -1, 1, 0, GRAYSCALE_MAX);
-	matrix_add_vector(&vectors, &index, -1, 2, 0, GRAYSCALE_MAX);
-
 	
 
 	printf("index: %d\n\n", index);
-	//sleep(2);
+	sleep(2);
 	//vectors.matrix[0*vectors.n + 0] = 10;
 	//vectors.matrix[1*vectors.n + 0] = 0;
 /*
@@ -129,6 +173,7 @@ int main (int argc, char **argv){
 		matrix_set(&rotation, 0, 1, -sin(a));
 		matrix_set(&rotation, 1, 1, cos(a));
 		matrix_set(&rotation, 3, 3, 1);
+		matrix_set(&rotation, 4, 4, 1);
 		matrix_mult(rotation, out_vectors, &vectors);
 		//matrix_print(vectors, true);
 		matrix_zero(&terminal);
@@ -148,6 +193,7 @@ int main (int argc, char **argv){
 		matrix_set(&shear, 0, 1, i/100.0);
 		matrix_set(&shear, 1, 1, 1);
 		matrix_set(&shear, 3, 3, 1);
+		matrix_set(&shear, 4, 4, 1);
 		matrix_mult(shear, out_vectors, &vectors);
 
 		matrix_zero(&terminal);

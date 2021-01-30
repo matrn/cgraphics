@@ -29,7 +29,16 @@ void matrix_draw(matrix_t input){
 
 	for(int row = 0; row < input.m; row ++){
 		for(int col = 0; col < input.n; col ++){
-			printf("%c", grayscale_to_char(input.matrix[row*input.n + col], GRAYSCALE_MIN, GRAYSCALE_MAX));
+			
+
+			union color_conv fin;
+			fin.vec = input.matrix[row*input.n + col];
+
+			union int16_to_bytes color;
+			color.b[0] = fin.b[1];
+			color.b[1] = fin.b[2];
+			//printf("color: %d\n", color.integer);
+			printf("\x1B[%dm%c", color.integer, grayscale_to_char(fin.b[0], GRAYSCALE_MIN, GRAYSCALE_MAX));
 		}
 		//usleep(10*1000);
 		//if(row < n-1) printf("\n");
@@ -48,21 +57,22 @@ void matrix_free(matrix_t input){
 }
 
 
-bool matrix_add_vector(matrix_t *vectors, int *index, int x, int y, int z, int grayscale){
+bool matrix_add_vector(matrix_t *vectors, int *index, int x, int y, int z, int grayscale, int ansi_color){
 	if(grayscale == GRAYSCALE_MIN) return false;
-	
+
 	for(int q = 0; q < *index; q ++){
 		if(vectors->matrix[0*vectors->n + q] == x && vectors->matrix[1*vectors->n + q] == y){
 			return false;
 		}
 	}
 
-	//printf("adding %d, %d\n", x, y);
+	printf("adding %d, %d, %d, color: %d\n", x, y, z, ansi_color);
 
 	vectors->matrix[0*vectors->n + *index] = x;
 	vectors->matrix[1*vectors->n + *index] = y;
 	vectors->matrix[2*vectors->n + *index] = z;
 	vectors->matrix[3*vectors->n + *index] = grayscale;
+	vectors->matrix[4*vectors->n + *index] = ansi_color;
 
 	(*index) ++;
 	
@@ -117,32 +127,6 @@ void matrix_zero(matrix_t *input){
 	memset(input->matrix, 0, input->m*input->n*sizeof(*input->matrix));
 }
 
-sbyte matrix_mult(matrix_t matrix1, matrix_t matrix2, matrix_t *matrix_out){   //matrices multiplication
-	if(matrix1.n == matrix2.m){
-		if(matrix_out->m != matrix1.m || matrix_out->n != matrix2.n){
-			if(matrix_out->matrix != NULL) free(matrix_out->matrix);
-			matrix_out->matrix = NULL;
-		}
-		if(matrix_out->matrix == NULL){
-			matrix_out->matrix = (MATRIX_TYPE *)calloc(matrix1.m*matrix2.n, sizeof(MATRIX_TYPE));
-			matrix_out->m = matrix1.m;   //rows of first
-			matrix_out->n = matrix2.n;   //cols or second matrix
-		}
-
-		for(int rows = 0; rows < matrix1.m; rows ++){
-			for(int cols = 0; cols < matrix2.n; cols ++){
-				MATRIX_TYPE sum = 0;
-				for(int m2_rows = 0; m2_rows < matrix2.m; m2_rows ++){
-					sum += matrix1.matrix[rows*matrix1.n + m2_rows] * matrix2.matrix[m2_rows*matrix2.n + cols];
-				}
-				matrix_out->matrix[rows*matrix2.n + cols] = sum;
-			}
-		}
-	}
-	else return -1;
-
-	return 0;
-}
 
 sbyte matrix_set(matrix_t *matrix, int m, int n, MATRIX_TYPE value){
 	if(m < 0 || n < 0) return -1;
@@ -167,6 +151,8 @@ byte matrix_vectorize(matrix_t matrix, matrix_t *vectors){
 }
 */
 
+
+
 sbyte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal, int max_index){
 	//printf(">%d %d\n", terminal->m, terminal->n);
 	for(int col = 0; col < max_index; col ++){
@@ -174,11 +160,21 @@ sbyte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal, int max_i
 		int y = vectors.matrix[1*vectors.n + col]*RATIO + terminal->m/2 + 1 + 0.4;
 		int z = vectors.matrix[2*vectors.n + col];
 		int grayscale = vectors.matrix[3*vectors.n + col];
+		int color = vectors.matrix[4*vectors.n + col];
 		//int z = 2*vectors.n + col;
 		//printf("%d %d\n", x, y);
 		//int pos = y*terminal->n + x;   //rows*total_columns + columns
 		//printf("%d ", pos);
-		matrix_set(terminal, terminal->m-y, x, grayscale);
+		union int16_to_bytes conv;
+		conv.integer = color;
+		
+		/*printf("gray: %d, color: %d\n", grayscale, color);
+		if(color != 0) sleep(2);*/
+		union color_conv fin;
+		fin.b[0] = grayscale;
+		fin.b[1] = conv.b[0];
+		fin.b[2] = conv.b[1];
+		matrix_set(terminal, terminal->m-y, x, fin.vec);
 		//terminal->matrix[pos] = vectors.matrix[pos];
 	}
 
@@ -221,4 +217,32 @@ char grayscale_to_char(int input, int minv, int maxv){
 	int converted_size = (input - minv)*(grayscale_size-1)/(maxv-minv);
 
 	return grayscale_letters[converted_size];
+}
+
+
+sbyte matrix_mult(matrix_t matrix1, matrix_t matrix2, matrix_t *matrix_out){   //matrices multiplication
+	if(matrix1.n == matrix2.m){
+		if(matrix_out->m != matrix1.m || matrix_out->n != matrix2.n){
+			if(matrix_out->matrix != NULL) free(matrix_out->matrix);
+			matrix_out->matrix = NULL;
+		}
+		if(matrix_out->matrix == NULL){
+			matrix_out->matrix = (MATRIX_TYPE *)calloc(matrix1.m*matrix2.n, sizeof(MATRIX_TYPE));
+			matrix_out->m = matrix1.m;   //rows of first
+			matrix_out->n = matrix2.n;   //cols or second matrix
+		}
+
+		for(int rows = 0; rows < matrix1.m; rows ++){
+			for(int cols = 0; cols < matrix2.n; cols ++){
+				MATRIX_TYPE sum = 0;
+				for(int m2_rows = 0; m2_rows < matrix2.m; m2_rows ++){
+					sum += matrix1.matrix[rows*matrix1.n + m2_rows] * matrix2.matrix[m2_rows*matrix2.n + cols];
+				}
+				matrix_out->matrix[rows*matrix2.n + cols] = sum;
+			}
+		}
+	}
+	else return -1;
+
+	return 0;
 }
