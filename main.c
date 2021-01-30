@@ -128,7 +128,7 @@ int main (int argc, char **argv){
 				img_getpixel4i(&img, x, y, &r, &g, &b, &a);
 				matrix_add_vector(&vectors, &index, (x-width/2)/img_scale, (height-y-height/2)/img_scale, 0, GRAYSCALE_MAX, rgbToAnsi256(r,g,b));
 				printf("index: %d. %d %d %d color: %d\n", index, r,g,b, rgbToAnsi256(r,g,b));
-				if(index > 5) exit(0);
+				//if(index > 5) exit(0);
 			}
 		}
 		

@@ -38,7 +38,7 @@ void matrix_draw(matrix_t input){
 			color.b[0] = fin.b[1];
 			color.b[1] = fin.b[2];
 			//printf("color: %d\n", color.integer);
-			printf("\x1B[%dm%c", color.integer, grayscale_to_char(fin.b[0], GRAYSCALE_MIN, GRAYSCALE_MAX));
+			printf("\033[%dm%c", color.integer, grayscale_to_char(fin.b[0], GRAYSCALE_MIN, GRAYSCALE_MAX));
 		}
 		//usleep(10*1000);
 		//if(row < n-1) printf("\n");
