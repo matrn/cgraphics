@@ -266,9 +266,10 @@ sbyte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal, int max_i
 			fin.b[3] = 255;
 		}
 		else{*/
-			fin.b[1] = conv.b[0];
-			fin.b[2] = conv.b[1];
-			fin.b[3] = conv.b[2];
+		fin.b[1] = conv.b[0];
+		fin.b[2] = conv.b[1];
+		fin.b[3] = conv.b[2];
+		//printf("%f color: %d %d %d\n", color, conv.b[0], conv.b[1], conv.b[2]);
 		//}
 		/*printf("gray: %d, color: %d %d %d\n", grayscale, conv.b[0], conv.b[1], conv.b[2]);
 		if(color != 0) sleep(2);

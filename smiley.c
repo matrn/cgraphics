@@ -50,7 +50,7 @@ int main (int argc, char **argv){
 	matrix_set(&scale, 1, 1, 0.8);
 	matrix_set(&scale, 2, 2, 0.8);
 	matrix_set(&scale, 3, 3, 1);   //grayscale
-	matrix_set(&transformation, 4, 4, 1);   //color
+	matrix_set(&scale, 4, 4, 1);   //color
 
 	
 
@@ -121,6 +121,7 @@ int main (int argc, char **argv){
 		matrix_set(&rotation, 0, 1, -sin(a));
 		matrix_set(&rotation, 1, 1, cos(a));
 		matrix_set(&rotation, 3, 3, 1);
+		matrix_set(&rotation, 4, 4, 1);
 		matrix_mult(rotation, out_vectors, &vectors);
 		
 		matrix_zero(&terminal);   //clear terminal matrix
@@ -140,6 +141,7 @@ int main (int argc, char **argv){
 		matrix_set(&shear, 0, 1, i/100.0);
 		matrix_set(&shear, 1, 1, 1);
 		matrix_set(&shear, 3, 3, 1);
+		matrix_set(&shear, 4, 4, 1);
 		matrix_mult(shear, out_vectors, &vectors);
 
 		matrix_zero(&terminal);
