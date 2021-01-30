@@ -7,7 +7,7 @@
 
 
 
-#define IMG "images/frog.jpg"
+#define IMG "images/dostal.jpg"
 
 
 int main (int argc, char **argv){
@@ -69,7 +69,7 @@ int main (int argc, char **argv){
 
 
 	term_info = get_terminal_info();
-	printf("width: %d, height: %d\n", term_info.width, term_info.height);
+	printf("Terminal width: %d, height: %d\n", term_info.width, term_info.height);
 	//width = term_info.width;
 	//height = term_info.height;
 
@@ -104,24 +104,66 @@ int main (int argc, char **argv){
 	
 	img_width = img.width;
 	img_height = img.height;
+
+	
+
+	
+	printf("IMG %dx%d, pixels: %d\n", img_width, img_height, img_width*img_height);
+
+	/*
+	double img_scale = 4;
+	
+	printf("scale: %f\n", img_scale);
+	if(img_height > term_info.height) img_scale = (double)img_height/term_info.height;
+	printf("scale: %f, %f\n", img_scale, (double)img_width/img_scale);
+	if((double)img_width/img_scale > term_info.width) img_scale = (double)img_width/term_info.width;
+	printf("scale: %f, %f\n", img_scale, (double)img_width/term_info.width);
+	sleep(3);
+	img_scale /= 2;
+	double dst_width = img_width/img_scale;
+	double dst_height = img_height/img_scale;
+	int xx=  0;
+	int yy=0;
+	for(int x = 0; x < dst_width; x += 1){
+		xx ++;
+		yy = 0;
+		for(int y = 0; y < dst_height; y += 1){
+			int r,g,b,a;
+			img_getpixel4i(&img, x*img_scale, y*img_scale, &r, &g, &b, &a);
+			//if(!(r == 0 && g == 0 && b == 0)) 
+			int dx = (x-dst_width/2);
+			int dy = (dst_height-y-dst_height/2);
+
+			if(abs(dx) > terminal.n || abs(dy) > terminal.m) printf("OUT: %d, %d\n", dx, dy);
+
+			matrix_add_vector(&vectors, &index, dx, dy, 0, GRAYSCALE_MAX, color_convert(r,g,b));
+			
+			printf("index: %d. %d %d %d\n", index, r,g,b);
+			//if(index > 5) exit(0);
+			yy ++;
+		}
+	}
+	printf("xx: %d, yy: %d\n", xx, yy);
+	*/
+	int width = img.width;
+	int height = img.height;
 	
 	float img_scale = 4;
 
-	if(img_height > term_info.height) img_scale = img_height/term_info.height/2;
+	if(height > term_info.height) img_scale = height/term_info.height/2;
 
-	for(int x = 0; x < img_width; x += 1){
-		for(int y = 0; y < img_height; y += 1){
+	for(int x = 0; x < width; x += 1){
+		for(int y = 0; y < height; y += 1){
 			int r,g,b,a;
 			img_getpixel4i(&img, x, y, &r, &g, &b, &a);
-			matrix_add_vector(&vectors, &index, (x-img_width/2)/img_scale, (img_height-y-img_height/2)/img_scale, 0, GRAYSCALE_MAX, color_convert(r,g,b));
+			matrix_add_vector(&vectors, &index, (x-width/2)/img_scale, (height-y-height/2)/img_scale, 0, GRAYSCALE_MAX, color_convert(r,g,b));
 			//printf("index: %d. %d %d %d color: %d\n", index, r,g,b, rgbToAnsi256(r,g,b));
 			//if(index > 5) exit(0);
 		}
 	}
 	
 	img_destroy(&img);
-
-
+	
 
 	//printf("scale: %f, term w: %d, term h: %d, width: %d, height: %d, RGBA %d %d %d %d\n", img_scale, term_info.width, term_info.height, width, height, r, g, b, a);
 		

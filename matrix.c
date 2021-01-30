@@ -87,7 +87,7 @@ void matrix_print(matrix_t input, bool print_size){
 
 void matrix_draw(matrix_t input){
 	//printf("\033[10A");
-	printf("\x1b[H\033[0m");   //home cursor
+	printf("\x1b[H"); //\033[0m");   //home cursor
 
 	/*
 	for(int i = 0; i < input.m; i ++){
@@ -107,8 +107,9 @@ void matrix_draw(matrix_t input){
 			//color.b[1] = fin.b[2];
 			//printf("color: %d, %d, %d\n", fin.b[1], fin.b[2], fin.b[3]);
 			//printf "\x1b[38;2;255;100;0mTRUECOLOR\x1b[0m\n"
-			if((fin.b[1] == 255 && fin.b[2] == 255 && fin.b[3] == 255) || (fin.b[1] == 0 && fin.b[2] == 0 && fin.b[3] == 0)) printf("%c", grayscale_to_char(fin.b[0], GRAYSCALE_MIN, GRAYSCALE_MAX));
-			else printf("\x1b[38;2;%d;%d;%dm%c", fin.b[1], fin.b[2], fin.b[3], grayscale_to_char(fin.b[0], GRAYSCALE_MIN, GRAYSCALE_MAX));
+			//if((fin.b[1] == 255 && fin.b[2] == 255 && fin.b[3] == 255) || (fin.b[1] == 0 && fin.b[2] == 0 && fin.b[3] == 0)) printf("%c", grayscale_to_char(fin.b[0], GRAYSCALE_MIN, GRAYSCALE_MAX));
+			printf("\x1b[38;2;%d;%d;%dm%c", fin.b[1], fin.b[2], fin.b[3], grayscale_to_char(fin.b[0], GRAYSCALE_MIN, GRAYSCALE_MAX));
+			//38/48
 		}
 		//usleep(10*1000);
 		//if(row < n-1) printf("\n");
@@ -272,7 +273,7 @@ sbyte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal, int max_i
 		/*printf("gray: %d, color: %d %d %d\n", grayscale, conv.b[0], conv.b[1], conv.b[2]);
 		if(color != 0) sleep(2);
 		*/
-		matrix_set(terminal, terminal->m-y, x, fin.vec);
+		matrix_set(terminal, terminal->m-y, x, fin.vec); // == -1) perror("no");
 		//terminal->matrix[pos] = vectors.matrix[pos];
 	}
 

@@ -27,7 +27,7 @@ int main (int argc, char **argv){
 	term_info = get_terminal_info();
 	width = term_info.width;
 	height = term_info.height;
-	printf("width: %d, height: %d\n", term_info.width, term_info.height);
+	printf("Terminal width: %d, height: %d\n", term_info.width, term_info.height);
 	
 
 	matrix_alloc(&terminal, height, width);
