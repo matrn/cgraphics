@@ -39,19 +39,15 @@ int main (int argc, char **argv){
 	matrix_set(&transformation, 1, 1, 0.5);
 	matrix_set(&transformation, 2, 2, 1);
 
-	double a = PI/4;
-	matrix_set(&rotation, 0, 0, cos(a));
-	matrix_set(&rotation, 1, 0, sin(a));
-	matrix_set(&rotation, 0, 1, -sin(a));
-	matrix_set(&rotation, 1, 1, cos(a));
+	
 
 	//printf(">%d<\n", grayscale_to_char(100, -100, 100));
 
-	double r = min(width, (height-1)*RATIO_INV)/2.0;
+	double r = (min(width, (height-1)*RATIO_INV)/2.0)*0.6;
 	
 	int index = 0;
 	for(double x = -r; x <= r; x += 0.5){
-		int y = sqrt(r*r - x*x)*RATIO;
+		int y = sqrt(r*r - x*x);//*RATIO;
 		//y = x*x;
 		//if(y > r) y = r;
 		//if(y < r) y = -r;
@@ -67,8 +63,8 @@ int main (int argc, char **argv){
 	printf("index: %d\n\n", index);
 	
 	//sleep(2);
-	//vectors.matrix[0*vectors.n + 0] = -2;
-	//vectors.matrix[1*vectors.n + 0] = -2;
+	//vectors.matrix[0*vectors.n + 0] = 10;
+	//vectors.matrix[1*vectors.n + 0] = 0;
 /*
 	for(int i = 0; i < m1.m*m1.n; i ++){
 		m1.matrix[i] = i+1;
@@ -80,12 +76,38 @@ int main (int argc, char **argv){
 */
 	matrix_print(transformation, true);
 	matrix_mult(transformation, vectors, &out_vectors);
-	matrix_print(out_vectors, true);
-	matrix_mult(rotation, out_vectors, &vectors);
-	matrix_print(vectors, true);
-
-	vectors_to_terminal_matrix(vectors, &terminal);
+	//matrix_print(out_vectors, true);
 	clear_terminal();
+
+	/*
+	double a = PI/180;
+	matrix_set(&rotation, 0, 0, cos(a));
+		matrix_set(&rotation, 1, 0, sin(a)*RATIO);
+		matrix_set(&rotation, 0, 1, -sin(a));
+		matrix_set(&rotation, 1, 1, cos(a)*RATIO);
+		matrix_mult(rotation, out_vectors, &vectors);
+		matrix_print(rotation, true);
+		//sleep(2);
+	vectors_to_terminal_matrix(vectors, &terminal);
+	matrix_draw(terminal);
+	//sleep(3);
+	*/
+	for(int i = 0; i < 7200; i ++){
+		double a = (i*PI)/180;
+		matrix_set(&rotation, 0, 0, cos(a));
+		matrix_set(&rotation, 1, 0, sin(a)*RATIO);
+		matrix_set(&rotation, 0, 1, -sin(a));
+		matrix_set(&rotation, 1, 1, cos(a)*RATIO);
+		matrix_mult(rotation, out_vectors, &vectors);
+		//matrix_print(vectors, true);
+		matrix_zero(&terminal);
+		vectors_to_terminal_matrix(vectors, &terminal);
+
+		//matrix_print(rotation, true);
+		matrix_draw(terminal);
+		usleep(10*1000);
+	}
+	vectors_to_terminal_matrix(vectors, &terminal);
 	matrix_draw(terminal);
 	sleep(3);
 

@@ -31,7 +31,7 @@ void matrix_draw(matrix_t input){
 		for(int col = 0; col < input.n; col ++){
 			printf("%c", grayscale_to_char(input.matrix[row*input.n + col], 0, 9));
 		}
-		usleep(10*1000);
+		//usleep(10*1000);
 		//if(row < n-1) printf("\n");
 		if(row < input.m - 1) printf("\n");
 	}
@@ -51,7 +51,7 @@ void matrix_free(matrix_t input){
 
 
 
-byte matrix_scale_and_add(int scalar1, matrix_t m1, int scalar2, matrix_t m2, matrix_t *matrix_out){   //a*A + a*B
+sbyte matrix_scale_and_add(int scalar1, matrix_t m1, int scalar2, matrix_t m2, matrix_t *matrix_out){   //a*A + a*B
 	int m = m1.m;
 	int n = m1.n;
 	
@@ -81,11 +81,11 @@ byte matrix_scale_and_add(int scalar1, matrix_t m1, int scalar2, matrix_t m2, ma
 }
 
 
-byte matrix_add(matrix_t m1, matrix_t m2, matrix_t *matrix_out){
+sbyte matrix_add(matrix_t m1, matrix_t m2, matrix_t *matrix_out){
 	return matrix_scale_and_add(1, m1, 1, m2, matrix_out);
 }
 
-byte matrix_sub(matrix_t m1, matrix_t m2, matrix_t *matrix_out){
+sbyte matrix_sub(matrix_t m1, matrix_t m2, matrix_t *matrix_out){
 	return matrix_scale_and_add(1, m1, -1, m2, matrix_out);
 }
 
@@ -101,7 +101,12 @@ char grayscale_to_char(int input, int minv, int maxv){
 }
 
 
-byte matrix_mult(matrix_t matrix1, matrix_t matrix2, matrix_t *matrix_out){   //matrices multiplication
+void matrix_zero(matrix_t *input){
+	//printf("%d\n", sizeof(*input->matrix));
+	memset(input->matrix, 0, input->m*input->n*sizeof(*input->matrix));
+}
+
+sbyte matrix_mult(matrix_t matrix1, matrix_t matrix2, matrix_t *matrix_out){   //matrices multiplication
 	if(matrix1.n == matrix2.m){
 		if(matrix_out->m != matrix1.m || matrix_out->n != matrix2.n){
 			if(matrix_out->matrix != NULL) free(matrix_out->matrix);
@@ -128,7 +133,8 @@ byte matrix_mult(matrix_t matrix1, matrix_t matrix2, matrix_t *matrix_out){   //
 	return 0;
 }
 
-byte matrix_set(matrix_t *matrix, int m, int n, MATRIX_TYPE value){
+sbyte matrix_set(matrix_t *matrix, int m, int n, MATRIX_TYPE value){
+	if(m < 0 || n < 0) return -1;
 	if(m >= matrix->m || n >= matrix->n) return -1;
 	matrix->matrix[m*matrix->n + n] = value;
 
@@ -150,8 +156,8 @@ byte matrix_vectorize(matrix_t matrix, matrix_t *vectors){
 }
 */
 
-byte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal){
-	printf(">%d %d\n", terminal->m, terminal->n);
+sbyte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal){
+	//printf(">%d %d\n", terminal->m, terminal->n);
 	for(int col = 0; col < vectors.n; col ++){
 		int x = vectors.matrix[0*vectors.n + col] + terminal->n/2;
 		int y = vectors.matrix[1*vectors.n + col] + terminal->m/2 + 1;

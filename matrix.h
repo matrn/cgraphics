@@ -16,7 +16,7 @@ typedef struct Matrix {
 	MATRIX_TYPE *matrix;
 } matrix_t;
 
-typedef int8_t byte;
+typedef int8_t sbyte;
 
 
 static const char grayscale_letters[] = " .:-=+*#%@";
@@ -28,17 +28,17 @@ void matrix_alloc(matrix_t *input, int m, int n);
 void matrix_free(matrix_t input);
 
 
+void matrix_zero(matrix_t *input);
 
+sbyte matrix_scale_and_add(int scalar1, matrix_t m1, int scalar2, matrix_t m2, matrix_t *matrix_out);
 
-byte matrix_scale_and_add(int scalar1, matrix_t m1, int scalar2, matrix_t m2, matrix_t *matrix_out);
+sbyte matrix_add(matrix_t m1, matrix_t m2, matrix_t *matrix_out);
+sbyte matrix_sub(matrix_t m1, matrix_t m2, matrix_t *matrix_out);
+sbyte matrix_mult(matrix_t matrix1, matrix_t matrix2, matrix_t *matrix_out);
+sbyte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal);
+sbyte matrix_vectorize(matrix_t matrix, matrix_t *vectors);
 
-byte matrix_add(matrix_t m1, matrix_t m2, matrix_t *matrix_out);
-byte matrix_sub(matrix_t m1, matrix_t m2, matrix_t *matrix_out);
-byte matrix_mult(matrix_t matrix1, matrix_t matrix2, matrix_t *matrix_out);
-byte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal);
-byte matrix_vectorize(matrix_t matrix, matrix_t *vectors);
-
-byte matrix_set(matrix_t *matrix, int x, int y, MATRIX_TYPE value);
+sbyte matrix_set(matrix_t *matrix, int x, int y, MATRIX_TYPE value);
 
 char grayscale_to_char(int input, int minv, int maxv);
 
