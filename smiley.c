@@ -3,7 +3,6 @@
 #include <math.h>
 #include "utils.h"
 #include "matrix.h"
-#include <imago2.h>
 
 
 #define PI 3.141592654
@@ -34,7 +33,7 @@ int main (int argc, char **argv){
 	int height = term_info.height;
 
 	matrix_alloc(&terminal, height, width);
-	matrix_alloc(&vectors, VECTOR_DIM, 80000); //width*height);
+	matrix_alloc(&vectors, VECTOR_DIM, 800); //width*height);
 	matrix_alloc(&transformation, VECTOR_DIM, VECTOR_DIM);
 	matrix_alloc(&rotation, VECTOR_DIM, VECTOR_DIM);
 	matrix_alloc(&scale, VECTOR_DIM, VECTOR_DIM);
@@ -57,33 +56,46 @@ int main (int argc, char **argv){
 	double r = (min(width, (height-1)*RATIO_INV)/2.0);
 	
 	int index = 0;
-	
+	/*
+	for(double x = -r; x <= r; x += 0.5){
+		int y = sqrt(r*r - x*x);//*RATIO;
+		//y = x*x;
+		//if(y > r) y = r;
+		//if(y < r) y = -r;
+		//printf("%f %d\n", r*r - x*x, y);
+		vectors.matrix[0*vectors.n + index] = x;
+		vectors.matrix[1*vectors.n + index] = y;
+		index ++;
+		vectors.matrix[0*vectors.n + index] = x;
+		vectors.matrix[1*vectors.n + index] = -y;
 
-	{
-		int width, height;
-		int r,g,b,a;
-
-		struct img_pixmap img;
-		img_init(&img);
-		img_load(&img, "finger_circle.png");
-		
-		width = img.width;
-		height = img.height;
-
-		for(int x = 0; x < width; x += 2){
-			for(int y = 0; y < width; y +=2){
-				img_getpixel4i(&img, x, y, &r, &g, &b, &a);
-				matrix_add_vector(&vectors, &index, (x-width/2)/2, (height-y -height/2)/2, 0, r);
-				printf("index: %d\n", index);
-			}
-		}
-		
-		img_destroy(&img);
-
-
-
-		printf("width: %d, height: %d, RGBA %d %d %d %d\n", width, height, r, g, b, a);
+		index ++;
 	}
+	*/
+	for(int i = 0; i < 360; i ++){
+		double theta = i/180.0*PI;
+    	int x = r * cos(theta);
+    	int y = r * sin(theta);
+		//printf("%d, %d\n", x, y);
+		
+		matrix_add_vector(&vectors, &index, x, y, 0, GRAYSCALE_MAX);
+	}
+	printf("index: %d\n\n", index);
+	
+	matrix_add_vector(&vectors, &index, r/2, r/2, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, r/2, r/2-1, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, r/2-1, r/2, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, r/2-1, r/2-1, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, r/2-2, r/2, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, r/2-2, r/2-1, 0, GRAYSCALE_MAX);
+
+	matrix_add_vector(&vectors, &index, -r/2, r/2, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, -r/2, r/2-1, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, -r/2+1, r/2, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, -r/2+1, r/2-1, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, -r/2+2, r/2, 0, GRAYSCALE_MAX);
+	matrix_add_vector(&vectors, &index, -r/2+2, r/2-1, 0, GRAYSCALE_MAX);
+
 	matrix_add_vector(&vectors, &index, 0, 0, 0, GRAYSCALE_MAX);
 	matrix_add_vector(&vectors, &index, 0, 1, 0, GRAYSCALE_MAX);
 	matrix_add_vector(&vectors, &index, 0, 2, 0, GRAYSCALE_MAX);
@@ -94,6 +106,15 @@ int main (int argc, char **argv){
 	matrix_add_vector(&vectors, &index, -1, 1, 0, GRAYSCALE_MAX);
 	matrix_add_vector(&vectors, &index, -1, 2, 0, GRAYSCALE_MAX);
 
+	
+	for(int i = 0; i < 180; i ++){
+		double theta = i/180.0*PI;
+    	int x = r/2 * cos(theta);
+    	int y = r/2 * sin(theta);
+		//printf("%d, %d\n", x, y);
+		
+		matrix_add_vector(&vectors, &index, x, -y -r/4, 0, GRAYSCALE_MAX);
+	}
 	
 
 	printf("index: %d\n\n", index);
@@ -116,11 +137,20 @@ int main (int argc, char **argv){
 	//matrix_print(out_vectors, true);
 	clear_terminal();
 
-	vectors_to_terminal_matrix(out_vectors, &terminal, index);
-	//matrix_print(rotation, true);
+	/*
+	double a = PI/180;
+	matrix_set(&rotation, 0, 0, cos(a));
+		matrix_set(&rotation, 1, 0, sin(a)*RATIO);
+		matrix_set(&rotation, 0, 1, -sin(a));
+		matrix_set(&rotation, 1, 1, cos(a)*RATIO);
+		matrix_mult(rotation, out_vectors, &vectors);
+		matrix_print(rotation, true);
+		//sleep(2);
+	vectors_to_terminal_matrix(vectors, &terminal);
 	matrix_draw(terminal);
-	sleep(3);
-
+	//sleep(3);
+	*/
+	
 	for(int i = 0; i < 360; i ++){
 		double a = (i*PI)/180.0;
 		//a = 0;

@@ -49,6 +49,8 @@ void matrix_free(matrix_t input){
 
 
 bool matrix_add_vector(matrix_t *vectors, int *index, int x, int y, int z, int grayscale){
+	if(grayscale == GRAYSCALE_MIN) return false;
+	
 	for(int q = 0; q < *index; q ++){
 		if(vectors->matrix[0*vectors->n + q] == x && vectors->matrix[1*vectors->n + q] == y){
 			return false;
