@@ -7,7 +7,7 @@
 
 
 
-#define IMG "images/dostal.jpg"
+#define IMG "images/frog.jpg"
 
 
 int main (int argc, char **argv){
@@ -124,8 +124,7 @@ int main (int argc, char **argv){
 
 
 	//printf("scale: %f, term w: %d, term h: %d, width: %d, height: %d, RGBA %d %d %d %d\n", img_scale, term_info.width, term_info.height, width, height, r, g, b, a);
-	
-	
+		
 
 	printf("index: %d\n\n", index);
 	sleep(1);
