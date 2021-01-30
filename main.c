@@ -92,6 +92,9 @@ int main (int argc, char **argv){
 	matrix_add_vector(&vectors, &index, -r/2+2, r/2, 0);
 	matrix_add_vector(&vectors, &index, -r/2+2, r/2-1, 0);
 
+	matrix_add_vector(&vectors, &index, 0, r/2, 0);
+	matrix_add_vector(&vectors, &index, 0, r/2-1, 0);
+
 	//sleep(2);
 	//vectors.matrix[0*vectors.n + 0] = 10;
 	//vectors.matrix[1*vectors.n + 0] = 0;
