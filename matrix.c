@@ -48,6 +48,22 @@ void matrix_free(matrix_t input){
 }
 
 
+bool matrix_add_vector(matrix_t *vectors, int *index, int x, int y, int z){
+	for(int q = 0; q < *index; q ++){
+		if(vectors->matrix[0*vectors->n + q] == x && vectors->matrix[1*vectors->n + q] == y){
+			return false;
+		}
+	}
+
+
+	vectors->matrix[0*vectors->n + *index] = x;
+	vectors->matrix[1*vectors->n + *index] = y;
+
+	(*index) ++;
+	
+	return true; //vector added
+}
+
 
 
 
@@ -156,9 +172,9 @@ byte matrix_vectorize(matrix_t matrix, matrix_t *vectors){
 }
 */
 
-sbyte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal){
+sbyte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal, int max_index){
 	//printf(">%d %d\n", terminal->m, terminal->n);
-	for(int col = 0; col < vectors.n; col ++){
+	for(int col = 0; col < max_index; col ++){
 		int x = vectors.matrix[0*vectors.n + col] + terminal->n/2;
 		int y = vectors.matrix[1*vectors.n + col] + terminal->m/2 + 1;
 		//int z = 2*vectors.n + col;
@@ -173,24 +189,25 @@ sbyte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal){
 }
 
 
-/*
-uint8_t m_copy(Matrix *matrix_out, Matrix matrix1){   //destination, source
-	int n = matrix1.n;
+
+sbyte matrix_copy(matrix_t matrix1, matrix_t *matrix_out){   //source, destination
 	int m = matrix1.m;
+	int n = matrix1.n;
 	
-	if(matrix_out->n != 0 && matrix_out->m != 0 && (matrix_out->n != n || matrix_out->m != m)){
+	if(matrix_out->m != 0 && matrix_out->n != 0 && (matrix_out->m != m || matrix_out->n != n)){
 		free(matrix_out->matrix);
 		matrix_out->matrix = NULL;
 	}
+
 	if(matrix_out->matrix == NULL){
-		matrix_out->matrix = (int *)calloc(n*m, sizeof(int));
-		matrix_out->n = n;
+		matrix_out->matrix = (MATRIX_TYPE *)calloc(m*n, sizeof(MATRIX_TYPE));
 		matrix_out->m = m;
+		matrix_out->n = n;
 	}
 
-	for(int rows = 0; rows < n; rows ++){
-		for(int cols = 0; cols < m; cols ++){
-			int pos = rows*m + cols;
+	for(int rows = 0; rows < m; rows ++){
+		for(int cols = 0; cols < n; cols ++){
+			int pos = rows*n + cols;
 			matrix_out->matrix[pos] = matrix1.matrix[pos];
 		}
 	}
@@ -200,7 +217,7 @@ uint8_t m_copy(Matrix *matrix_out, Matrix matrix1){   //destination, source
 
 
 
-
+/*
 int main(){
 	//int n1=0, m1=0;
 	//int n2=0, m2=0;

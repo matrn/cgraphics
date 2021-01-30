@@ -35,10 +35,13 @@ sbyte matrix_scale_and_add(int scalar1, matrix_t m1, int scalar2, matrix_t m2, m
 sbyte matrix_add(matrix_t m1, matrix_t m2, matrix_t *matrix_out);
 sbyte matrix_sub(matrix_t m1, matrix_t m2, matrix_t *matrix_out);
 sbyte matrix_mult(matrix_t matrix1, matrix_t matrix2, matrix_t *matrix_out);
-sbyte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal);
+sbyte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal, int max_index);
 sbyte matrix_vectorize(matrix_t matrix, matrix_t *vectors);
 
 sbyte matrix_set(matrix_t *matrix, int x, int y, MATRIX_TYPE value);
+
+sbyte matrix_copy(matrix_t matrix1, matrix_t *matrix_out);
+bool matrix_add_vector(matrix_t *vectors, int *index, int x, int y, int z);
 
 char grayscale_to_char(int input, int minv, int maxv);
 
