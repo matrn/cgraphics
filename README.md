@@ -12,6 +12,9 @@
 - build: `cd libimago && make`
 - install: `sudo make install && sudo ldconfig`
 
+## ToDo
+- [ ] proper image scaling
+- [ ] better memory allocation for vectors
 
 ![frog](frog.jpg)
 ![smiley](smiley.jpg)
