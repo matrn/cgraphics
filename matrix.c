@@ -55,6 +55,7 @@ bool matrix_add_vector(matrix_t *vectors, int *index, int x, int y, int z){
 		}
 	}
 
+	//printf("adding %d, %d\n", x, y);
 
 	vectors->matrix[0*vectors->n + *index] = x;
 	vectors->matrix[1*vectors->n + *index] = y;
@@ -175,8 +176,8 @@ byte matrix_vectorize(matrix_t matrix, matrix_t *vectors){
 sbyte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal, int max_index){
 	//printf(">%d %d\n", terminal->m, terminal->n);
 	for(int col = 0; col < max_index; col ++){
-		int x = vectors.matrix[0*vectors.n + col] + terminal->n/2;
-		int y = vectors.matrix[1*vectors.n + col] + terminal->m/2 + 1;
+		int x = vectors.matrix[0*vectors.n + col] + terminal->n/2 + 0.4;
+		int y = vectors.matrix[1*vectors.n + col] + terminal->m/2 + 1 + 0.4;
 		//int z = 2*vectors.n + col;
 		//printf("%d %d\n", x, y);
 		//int pos = y*terminal->n + x;   //rows*total_columns + columns
