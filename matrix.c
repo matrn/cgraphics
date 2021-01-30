@@ -31,14 +31,15 @@ void matrix_draw(matrix_t input){
 		for(int col = 0; col < input.n; col ++){
 			
 
-			union color_conv fin;
+			union sat_and_color_u fin;
 			fin.vec = input.matrix[row*input.n + col];
 
-			union int16_to_bytes color;
-			color.b[0] = fin.b[1];
-			color.b[1] = fin.b[2];
-			//printf("color: %d\n", color.integer);
-			printf("\033[%dm%c", color.integer, grayscale_to_char(fin.b[0], GRAYSCALE_MIN, GRAYSCALE_MAX));
+			//union int16_to_bytes color;
+			//color.b[0] = fin.b[1];
+			//color.b[1] = fin.b[2];
+			//printf("color: %d, %d, %d\n", fin.b[1], fin.b[2], fin.b[3]);
+			//printf "\x1b[38;2;255;100;0mTRUECOLOR\x1b[0m\n"
+			printf("\x1b[38;2;%d;%d;%dm%c", fin.b[1], fin.b[2], fin.b[3], grayscale_to_char(fin.b[0], GRAYSCALE_MIN, GRAYSCALE_MAX));
 		}
 		//usleep(10*1000);
 		//if(row < n-1) printf("\n");
@@ -57,7 +58,7 @@ void matrix_free(matrix_t input){
 }
 
 
-bool matrix_add_vector(matrix_t *vectors, int *index, int x, int y, int z, int grayscale, int ansi_color){
+bool matrix_add_vector(matrix_t *vectors, int *index, int x, int y, int z, int grayscale, MATRIX_TYPE color){
 	if(grayscale == GRAYSCALE_MIN) return false;
 
 	for(int q = 0; q < *index; q ++){
@@ -66,13 +67,16 @@ bool matrix_add_vector(matrix_t *vectors, int *index, int x, int y, int z, int g
 		}
 	}
 
-	printf("adding %d, %d, %d, color: %d\n", x, y, z, ansi_color);
+	//printf("adding %d, %d, %d, color: %d\n", x, y, z, color);
+	union color_conv_u conv;
+	conv.vec = color;
+	//printf("color: %d %d %d\n", conv.b[0], conv.b[1], conv.b[2]);
 
 	vectors->matrix[0*vectors->n + *index] = x;
 	vectors->matrix[1*vectors->n + *index] = y;
 	vectors->matrix[2*vectors->n + *index] = z;
 	vectors->matrix[3*vectors->n + *index] = grayscale;
-	vectors->matrix[4*vectors->n + *index] = ansi_color;
+	vectors->matrix[4*vectors->n + *index] = color;
 
 	(*index) ++;
 	
@@ -160,20 +164,22 @@ sbyte vectors_to_terminal_matrix(matrix_t vectors, matrix_t *terminal, int max_i
 		int y = vectors.matrix[1*vectors.n + col]*RATIO + terminal->m/2 + 1 + 0.4;
 		int z = vectors.matrix[2*vectors.n + col];
 		int grayscale = vectors.matrix[3*vectors.n + col];
-		int color = vectors.matrix[4*vectors.n + col];
+		MATRIX_TYPE color = vectors.matrix[4*vectors.n + col];
 		//int z = 2*vectors.n + col;
 		//printf("%d %d\n", x, y);
 		//int pos = y*terminal->n + x;   //rows*total_columns + columns
 		//printf("%d ", pos);
-		union int16_to_bytes conv;
-		conv.integer = color;
+		union color_conv_u conv;
+		conv.vec = color;
 		
-		/*printf("gray: %d, color: %d\n", grayscale, color);
-		if(color != 0) sleep(2);*/
-		union color_conv fin;
+		/*printf("gray: %d, color: %d %d %d\n", grayscale, conv.b[0], conv.b[1], conv.b[2]);
+		if(color != 0) sleep(2);
+		*/
+		union sat_and_color_u fin;
 		fin.b[0] = grayscale;
 		fin.b[1] = conv.b[0];
 		fin.b[2] = conv.b[1];
+		fin.b[3] = conv.b[2];
 		matrix_set(terminal, terminal->m-y, x, fin.vec);
 		//terminal->matrix[pos] = vectors.matrix[pos];
 	}

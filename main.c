@@ -34,12 +34,35 @@ int rgbToAnsi256(int r, int g, int b) {
     return ansi;
 }
 
+MATRIX_TYPE color_convert(int r, int g, int b){
+	//printf("RGB: %d %d %d\n", r,g,b);
+	union color_conv_u color;
+	color.b[0] = r;
+	color.b[1] = g;
+	color.b[2] = b;
+
+	return color.vec;
+}
+
 
 int main (int argc, char **argv){
     //DEBUG_PRINT("Debug level: %d", (int) DEBUG);
-	
+	/*
 	printf("ansi: %d\n", rgbToAnsi256(253,13,0));
+	printf("\033[0;%dm dfgfdg\n", 196);//rgbToAnsi256(253,13,0));
 
+	double c = color_convert(255, 15, 0);
+	union color_conv_u conv;
+		conv.vec = c;
+		
+	printf("color: %d %d %d\n", conv.b[0], conv.b[1], conv.b[2]);
+	printf("\x1b[38;2;%d;%d;%dmhey\n", conv.b[0], conv.b[1], conv.b[2]);//, grayscale_to_char(fin.b[0], GRAYSCALE_MIN, GRAYSCALE_MAX));
+
+
+	sleep(2);
+	*/
+	//union sat_and_color_conv a;
+	//a.
 	/*
 	union int16_to_bytes conv;
 	conv.integer = -1;
@@ -114,7 +137,7 @@ int main (int argc, char **argv){
 
 		struct img_pixmap img;
 		img_init(&img);
-		img_load(&img, "images/rainbow.jpeg");
+		img_load(&img, "images/dostal.jpg");
 		
 		width = img.width;
 		height = img.height;
@@ -126,8 +149,8 @@ int main (int argc, char **argv){
 		for(int x = 0; x < width; x += 1){
 			for(int y = 0; y < height; y += 1){
 				img_getpixel4i(&img, x, y, &r, &g, &b, &a);
-				matrix_add_vector(&vectors, &index, (x-width/2)/img_scale, (height-y-height/2)/img_scale, 0, GRAYSCALE_MAX, rgbToAnsi256(r,g,b));
-				printf("index: %d. %d %d %d color: %d\n", index, r,g,b, rgbToAnsi256(r,g,b));
+				matrix_add_vector(&vectors, &index, (x-width/2)/img_scale, (height-y-height/2)/img_scale, 0, GRAYSCALE_MAX, color_convert(r,g,b));
+				//printf("index: %d. %d %d %d color: %d\n", index, r,g,b, rgbToAnsi256(r,g,b));
 				//if(index > 5) exit(0);
 			}
 		}
@@ -181,7 +204,7 @@ int main (int argc, char **argv){
 
 		//matrix_print(rotation, true);
 		matrix_draw(terminal);
-		usleep(10*1000);
+		usleep(5*1000);
 	}
 	
 	
@@ -200,7 +223,7 @@ int main (int argc, char **argv){
 		vectors_to_terminal_matrix(vectors, &terminal, index);
 
 		matrix_draw(terminal);
-		usleep(10*1000);
+		usleep(5*1000);
 
 		if(pos == 0) i ++;
 		if(i == 100){

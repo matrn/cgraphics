@@ -24,14 +24,14 @@ typedef struct Matrix {
 } matrix_t;
 
 
-union color_conv {
+union sat_and_color_u {
 	MATRIX_TYPE vec;
-	char b[3];
+	unsigned char b[4];
 };
 
-union int16_to_bytes {
-	int16_t integer;
-	char b[2];
+union color_conv_u {
+	MATRIX_TYPE vec;
+	unsigned char b[3];
 };
 
 
@@ -60,7 +60,7 @@ sbyte matrix_vectorize(matrix_t matrix, matrix_t *vectors);
 sbyte matrix_set(matrix_t *matrix, int x, int y, MATRIX_TYPE value);
 
 sbyte matrix_copy(matrix_t matrix1, matrix_t *matrix_out);
-bool matrix_add_vector(matrix_t *vectors, int *index, int x, int y, int z, int grayscale, int ansi_color);
+bool matrix_add_vector(matrix_t *vectors, int *index, int x, int y, int z, int grayscale, MATRIX_TYPE color);
 
 char grayscale_to_char(int input, int minv, int maxv);
 
